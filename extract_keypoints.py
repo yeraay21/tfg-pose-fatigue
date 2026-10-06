@@ -33,10 +33,6 @@ def main():
     results = model.track(VIDEO, stream=True, verbose=False, persist=True)  # track the video frame by frame
     
     for frame_idx, result in enumerate(results):
-
-        # TODO: si result.boxes.id es None -> track_ids = []
-        #       si no -> pasar a lista de enteros
-        # Pista: .cpu().numpy().astype(int).tolist()
         track_ids = result.boxes.id.cpu().numpy().astype(int).tolist() if result.boxes.id is not None else []
 
         
