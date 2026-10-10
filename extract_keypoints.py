@@ -11,10 +11,10 @@ import pandas as pd
 from ultralytics import YOLO
 
 # Configuración
-VIDEO = "dataset/squats/correct/subject_022_squat_good_side.mp4"
+# VIDEO = "dataset/squats/correct/subject_022_squat_good_side.mp4"
+VIDEO = "dataset/squats/incorrect/subject_022_squat_bad_side.mp4"
 MODEL = "yolo26m-pose.pt"
-SUBJECT_IDX = 0          # índice del sujeto en la lista de detecciones (elegido a mano)
-SUBJECT_ID = 1           # ID del tracker del sujeto
+SUBJECT_IDS = [1, 21, 43]   # IDs del tracker del sujeto (puede cambiar de ID si alguien lo tapa)
 OUT_DIR = Path("keypoints")
 N_KPTS = 17
 
@@ -35,11 +35,13 @@ def main():
     for frame_idx, result in enumerate(results):
         track_ids = result.boxes.id.cpu().numpy().astype(int).tolist() if result.boxes.id is not None else []
 
-        
-        if SUBJECT_ID not in track_ids:
-            row = [frame_idx] + [np.nan] * (N_KPTS * 3) 
+        # Primer ID del frame que pertenezca al sujeto (None si no está)
+        subject_id = next((t for t in track_ids if t in SUBJECT_IDS), None)
+
+        if subject_id is None:
+            row = [frame_idx] + [np.nan] * (N_KPTS * 3)
         else:
-            pos = track_ids.index(SUBJECT_ID)
+            pos = track_ids.index(subject_id)
             xy = result.keypoints.xy[pos].cpu().numpy()  # x and y coordinates
             conf = result.keypoints.conf[pos].cpu().numpy()  # confidence scores
             row = [frame_idx] + np.column_stack((xy, conf)).flatten().tolist()

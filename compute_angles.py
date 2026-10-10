@@ -9,7 +9,8 @@ import numpy as np
 import pandas as pd
 
 # Configuración
-CSV_IN = Path("keypoints/subject_022_squat_good_side.csv")
+# CSV_IN = Path("keypoints/subject_022_squat_good_side.csv")
+CSV_IN = Path("keypoints/subject_022_squat_bad_side.csv")
 EXERCISE = "squat"       # "squat" o "bicep_curl"
 CONF_MIN = 0.5           # keypoints con menos confianza -> NaN
 MAX_GAP = 5              # huecos de NaN de hasta MAX_GAP frames se interpolan
