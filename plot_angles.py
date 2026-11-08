@@ -10,7 +10,7 @@ import pandas as pd
 # Configuración
 CSV_GOOD = Path("angles/subject_022_squat_good_side.csv")
 CSV_BAD = Path("angles/subject_022_squat_bad_side.csv")
-ANGLE = "knee_left"            # pierna cercana a la cámara
+ANGLE = "knee"                 # pierna cercana a la cámara (near_side)
 RANGE = (80, 140)              # rango correcto en ángulo interior (= 220-280° del paper, 360 - θ)
 OUT_DIR = Path("plots")
 
