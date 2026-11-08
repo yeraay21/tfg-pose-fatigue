@@ -1,7 +1,8 @@
 """
 Calcula ángulos articulares frame a frame a partir del CSV de keypoints.
-Fórmula del paper: θ(u,v,p) = 180·(atan2(yp−yv, xp−xv) − atan2(yu−yv, xu−xv)) / π  (mod 360)
-Ángulo en el vértice v. Salida: CSV con columnas frame, <nombre_angulo>...
+Ángulo interior en el vértice v: θ = arccos( (u−v)·(p−v) / (|u−v|·|p−v|) ), en 0-180°.
+No depende de hacia dónde mire el sujeto (sustituye al ángulo orientado 0-360 del paper).
+Salida: CSV con columnas frame, <nombre_angulo>...
 """
 from pathlib import Path
 
@@ -34,10 +35,13 @@ def clean_keypoints(df):
 
 
 def angle(df, u, v, p):
-    """Ángulo en v (grados, 0-360) para todos los frames a la vez."""
-    phi_p = np.arctan2(df[f"y{p}"] - df[f"y{v}"], df[f"x{p}"] - df[f"x{v}"])
-    phi_u = np.arctan2(df[f"y{u}"] - df[f"y{v}"], df[f"x{u}"] - df[f"x{v}"])
-    return np.degrees(phi_p - phi_u) % 360
+    """Ángulo interior en v (grados, 0-180) para todos los frames a la vez."""
+    # Vectores desde el vértice v hacia u y hacia p, shape (frames, 2)
+    a = df[[f"x{u}", f"y{u}"]].to_numpy() - df[[f"x{v}", f"y{v}"]].to_numpy()
+    b = df[[f"x{p}", f"y{p}"]].to_numpy() - df[[f"x{v}", f"y{v}"]].to_numpy()
+    cos = (a * b).sum(axis=1) / (np.linalg.norm(a, axis=1) * np.linalg.norm(b, axis=1))
+    # clip: por redondeo cos puede salir 1.0000001 y arccos daría NaN
+    return np.degrees(np.arccos(np.clip(cos, -1, 1)))
 
 
 def main():

@@ -11,8 +11,7 @@ import pandas as pd
 CSV_GOOD = Path("angles/subject_022_squat_good_side.csv")
 CSV_BAD = Path("angles/subject_022_squat_bad_side.csv")
 ANGLE = "knee_left"            # pierna cercana a la cámara
-PAPER_RANGE = (220, 280)       # rango correcto del paper (squat)
-MIRROR = True                  # el sujeto mira a la izquierda -> nuestro ángulo = 360 - θ del paper
+RANGE = (80, 140)              # rango correcto en ángulo interior (= 220-280° del paper, 360 - θ)
 OUT_DIR = Path("plots")
 
 
@@ -20,17 +19,14 @@ def main():
     good = pd.read_csv(CSV_GOOD)
     bad = pd.read_csv(CSV_BAD)
 
-    low, high = sorted((PAPER_RANGE[0], PAPER_RANGE[1])) if not MIRROR else sorted((360 - PAPER_RANGE[0], 360 - PAPER_RANGE[1]))
+    low, high = RANGE
 
     fig, ax = plt.subplots(figsize=(12, 5))
 
     ax.plot(good["frame"], good[ANGLE], color="blue", label="Correcto")
     ax.plot(bad["frame"], bad[ANGLE], color="red", label="Incorrecto")
 
-    # Rango del paper; la etiqueta indica si está en espejo
-    range_label = f"Rango paper: {low}-{high}°"
-    if MIRROR:
-        range_label += f" (espejo de {PAPER_RANGE[0]}-{PAPER_RANGE[1]}°)"
+    range_label = f"Rango correcto: {low}-{high}° (= {360 - high}-{360 - low}° del paper)"
     ax.axhline(low, color="gray", linestyle="--", alpha=0.7, label=range_label)
     ax.axhline(high, color="gray", linestyle="--", alpha=0.7)
 
